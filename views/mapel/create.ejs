@@ -1,0 +1,68 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Tambah Mata Pelajaran Baru</h1>
+    <p class="page-subtitle">Daftarkan mata pelajaran baru dan tetapkan guru pengampu</p>
+  </div>
+  <a href="/mapel" class="btn btn-outline-secondary rounded-3">
+    <i class="fas fa-arrow-left me-1"></i> Kembali
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-book text-primary me-2"></i>Formulir Mata Pelajaran</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="/mapel" method="POST">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="kode_mapel" class="form-label fw-semibold small">Kode Mata Pelajaran <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="kode_mapel" name="kode_mapel" placeholder="Contoh: MP-MAT-01" value="<%= formData.kode_mapel || '' %>" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="kategori" class="form-label fw-semibold small">Kategori Mata Pelajaran</label>
+              <select class="form-select" id="kategori" name="kategori">
+                <option value="Wajib" <%= formData.kategori === 'Wajib' ? 'selected' : '' %>>Wajib Nasional</option>
+                <option value="Peminatan" <%= formData.kategori === 'Peminatan' ? 'selected' : '' %>>Peminatan / Jurusan</option>
+                <option value="Muatan Lokal" <%= formData.kategori === 'Muatan Lokal' ? 'selected' : '' %>>Muatan Lokal</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="nama_mapel" class="form-label fw-semibold small">Nama Mata Pelajaran <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nama_mapel" name="nama_mapel" placeholder="Contoh: Matematika Peminatan" value="<%= formData.nama_mapel || '' %>" required>
+            </div>
+
+            <div class="col-12">
+              <label for="guru_id" class="form-label fw-semibold small">Guru Pengampu</label>
+              <select class="form-select" id="guru_id" name="guru_id">
+                <option value="">-- Belum Ditentukan --</option>
+                <% guruList.forEach(g => { %>
+                  <option value="<%= g.id %>" <%= formData.guru_id == g.id ? 'selected' : '' %>>
+                    <%= g.nama %> (NIP: <%= g.nip %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a href="/mapel" class="btn btn-light border px-4">Batal</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="fas fa-save me-1"></i> Simpan Mata Pelajaran
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

@@ -1,0 +1,125 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Detail Data Siswa</h1>
+    <p class="page-subtitle">Informasi lengkap peserta didik dan rekam jejak akademik</p>
+  </div>
+  <div class="d-flex gap-2">
+    <% if (currentUser.role === 'admin') { %>
+      <a href="/siswa/edit/<%= siswa.id %>" class="btn btn-warning rounded-3 px-3">
+        <i class="fas fa-edit me-1"></i> Edit Data
+      </a>
+    <% } %>
+    <a href="/siswa" class="btn btn-outline-secondary rounded-3">
+      <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Profile Summary Card -->
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100">
+      <div class="avatar-circle mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.2rem;">
+        <%= siswa.nama.charAt(0).toUpperCase() %>
+      </div>
+      <h5 class="fw-bold text-dark mb-1"><%= siswa.nama %></h5>
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-3 align-self-center">
+        <%= siswa.nama_kelas || 'Belum Ditentukan' %>
+      </span>
+
+      <ul class="list-group list-group-flush text-start small">
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">NIS</span>
+          <span class="fw-semibold text-dark"><%= siswa.nis %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">NISN</span>
+          <span class="fw-semibold text-dark"><%= siswa.nisn %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Jenis Kelamin</span>
+          <span class="fw-semibold text-dark"><%= siswa.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan' %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Tanggal Lahir</span>
+          <span class="fw-semibold text-dark">
+            <%= new Date(siswa.tanggal_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+          </span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Telepon / WhatsApp</span>
+          <span class="fw-semibold text-dark"><%= siswa.no_telp || '-' %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Akun User Login</span>
+          <span class="fw-semibold text-primary"><%= siswa.username || '(Belum dibuat)' %></span>
+        </li>
+        <li class="list-group-item px-0 py-2">
+          <span class="text-muted d-block mb-1">Alamat Lengkap</span>
+          <span class="fw-medium text-dark"><%= siswa.alamat || '-' %></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Academic Records / Grades Card -->
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-file-invoice text-primary me-2"></i>Rekam Nilai Akademik Siswa</h6>
+        <% if (currentUser.role === 'admin' || currentUser.role === 'guru') { %>
+          <a href="/nilai/create" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+            <i class="fas fa-plus me-1"></i> Input Nilai
+          </a>
+        <% } %>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Mata Pelajaran</th>
+                <th>Semester</th>
+                <th class="text-center">Tugas</th>
+                <th class="text-center">UTS</th>
+                <th class="text-center">UAS</th>
+                <th class="text-center">Nilai Akhir</th>
+                <th class="text-center">Predikat</th>
+                <th class="pe-4">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (nilaiList && nilaiList.length > 0) { %>
+                <% nilaiList.forEach(n => { %>
+                  <tr>
+                    <td class="ps-4 fw-semibold text-dark"><%= n.nama_mapel %></td>
+                    <td><%= n.semester %> (<%= n.tahun_ajaran %>)</td>
+                    <td class="text-center"><%= n.nilai_tugas %></td>
+                    <td class="text-center"><%= n.nilai_uts %></td>
+                    <td class="text-center"><%= n.nilai_uas %></td>
+                    <td class="text-center fw-bold text-primary"><%= n.nilai_akhir %></td>
+                    <td class="text-center">
+                      <span class="badge badge-grade-<%= n.predikat.replace('+', 'p') %> px-2 py-1"><%= n.predikat %></span>
+                    </td>
+                    <td class="pe-4 small text-muted"><%= n.keterangan %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="8" class="text-center py-5 text-muted">Belum ada data nilai tercatat untuk siswa ini.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

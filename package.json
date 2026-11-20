@@ -1,0 +1,35 @@
+{
+  "name": "sia-sekolah",
+  "version": "1.0.0",
+  "description": "Sistem Informasi Akademik Sekolah (SIA) berbasis Web dan Docker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node database/initDb.js"
+  },
+  "keywords": [
+    "sia",
+    "sekolah",
+    "cloud-computing",
+    "docker",
+    "express",
+    "mysql",
+    "ejs",
+    "mvc"
+  ],
+  "author": "Antigravity Pair Programmer",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0"
+  }
+}
+

@@ -1,0 +1,66 @@
+services:
+  # ========================================================
+  # Database Service: MySQL 8.0
+  # ========================================================
+  mysql:
+    image: mysql:8.0
+    container_name: sia_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sia_sekolah
+      MYSQL_USER: sia_user
+      MYSQL_PASSWORD: sia_password123
+    ports:
+      - "3306:3306"
+    volumes:
+      # Named volume agar data tetap persisten meskipun container di-restart/stop
+      - mysql_data:/var/lib/mysql
+      # Script inisialisasi schema & dummy data otomatis dieksekusi saat container pertama kali dibuat
+      - ./database/sia_sekolah.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    networks:
+      - sia_network
+
+  # ========================================================
+  # Web Application Service: Express.js (Node.js)
+  # ========================================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sia_web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      SESSION_SECRET: ${SESSION_SECRET:-sia_sekolah_super_secret_production_key_2025}
+      # Berkomunikasi dengan database melalui nama service 'mysql'
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: sia_user
+      DB_PASSWORD: sia_password123
+      DB_NAME: sia_sekolah
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - sia_network
+
+# ========================================================
+# Volumes & Networks Definition
+# ========================================================
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  sia_network:
+    driver: bridge

@@ -1,0 +1,145 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Manajemen Mata Pelajaran</h1>
+    <p class="page-subtitle">Kelola kurikulum, daftar mata pelajaran, dan penugasan guru pengampu</p>
+  </div>
+  <% if (currentUser.role === 'admin') { %>
+    <div>
+      <a href="/mapel/create" class="btn btn-primary rounded-3 px-3 py-2 fw-semibold shadow-sm">
+        <i class="fas fa-plus me-1"></i> Tambah Mata Pelajaran
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Search Bar -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-3">
+    <form action="/mapel" method="GET" class="row g-2 align-items-center">
+      <div class="col-12 col-md-8">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Cari kode mapel, nama mapel, atau guru pengampu..." value="<%= search %>">
+        </div>
+      </div>
+      <div class="col-12 col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">
+          <i class="fas fa-search me-1"></i> Cari Mapel
+        </button>
+        <% if (search) { %>
+          <a href="/mapel" class="btn btn-light border" title="Reset pencarian">
+            <i class="fas fa-undo"></i>
+          </a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table Container -->
+<div class="card card-table">
+  <div class="card-header-custom">
+    <span class="fw-bold text-dark fs-6">
+      Total Mata Pelajaran: <span class="badge bg-amber text-dark rounded-pill" style="background-color: #fde68a;"><%= totalCount %></span>
+    </span>
+    <small class="text-muted">Halaman <%= currentPage %> dari <%= totalPages || 1 %></small>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>Kode Mapel</th>
+          <th>Nama Mata Pelajaran</th>
+          <th>Kategori</th>
+          <th>Guru Pengampu</th>
+          <% if (currentUser.role === 'admin') { %>
+            <th class="text-center" style="width: 140px;">Aksi</th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (mapelList && mapelList.length > 0) { %>
+          <% mapelList.forEach((m, idx) => { %>
+            <tr>
+              <td><%= ((currentPage - 1) * 10) + idx + 1 %></td>
+              <td><span class="badge bg-light text-dark border fw-bold"><%= m.kode_mapel %></span></td>
+              <td><span class="fw-bold text-dark"><%= m.nama_mapel %></span></td>
+              <td>
+                <span class="badge <%= m.kategori === 'Wajib' ? 'bg-primary-subtle text-primary' : (m.kategori === 'Peminatan' ? 'bg-purple-subtle text-purple' : 'bg-success-subtle text-success') %> px-3 py-1 rounded-pill">
+                  <%= m.kategori %>
+                </span>
+              </td>
+              <td>
+                <% if (m.guru_nama) { %>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-chalkboard-teacher text-success"></i>
+                    <div>
+                      <span class="fw-semibold text-dark"><%= m.guru_nama %></span>
+                      <small class="text-muted d-block">NIP: <%= m.guru_nip %></small>
+                    </div>
+                  </div>
+                <% } else { %>
+                  <span class="text-muted small"><em>Belum ditugaskan</em></span>
+                <% } %>
+              </td>
+              <% if (currentUser.role === 'admin') { %>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="/mapel/edit/<%= m.id %>" class="btn btn-outline-warning" title="Edit Mapel">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="delete-form-mapel-<%= m.id %>" action="/mapel/delete/<%= m.id %>" method="POST" class="d-inline">
+                      <button type="button" class="btn btn-outline-danger" title="Hapus Mapel" onclick="confirmDelete('delete-form-mapel-<%= m.id %>', '<%= m.nama_mapel %>')">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              <% } %>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="<%= currentUser.role === 'admin' ? 6 : 5 %>" class="text-center py-5 text-muted">
+              <i class="fas fa-book-open fs-2 mb-2 d-block text-secondary"></i>
+              Tidak ada data mata pelajaran ditemukan.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <small class="text-muted">Menampilkan halaman <%= currentPage %> dari <%= totalPages %></small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="/mapel?page=<%= currentPage - 1 %>&search=<%= search %>">Sebelumnya</a>
+          </li>
+          <% for(let p = 1; p <= totalPages; p++) { %>
+            <li class="page-item <%= currentPage === p ? 'active' : '' %>">
+              <a class="page-link" href="/mapel?page=<%= p %>&search=<%= search %>"><%= p %></a>
+            </li>
+          <% } %>
+          <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="/mapel?page=<%= currentPage + 1 %>&search=<%= search %>">Selanjutnya</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../layouts/footer') %>
+

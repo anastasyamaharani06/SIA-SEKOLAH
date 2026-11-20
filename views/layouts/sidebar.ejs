@@ -1,0 +1,113 @@
+<aside class="app-sidebar" id="appSidebar">
+  <!-- Brand -->
+  <a href="/dashboard" class="sidebar-brand">
+    <div class="brand-icon">
+      <i class="fas fa-graduation-cap"></i>
+    </div>
+    <div class="d-flex flex-column">
+      <span class="lh-1">SIA SEKOLAH</span>
+      <small class="text-muted fw-normal" style="font-size: 0.68rem; letter-spacing: 0.05em;">ACADEMIC CLOUD SYSTEM</small>
+    </div>
+  </a>
+
+  <!-- Menu Navigation -->
+  <ul class="sidebar-menu">
+    <li class="menu-header">Menu Utama</li>
+    
+    <li class="menu-item">
+      <a href="/dashboard" class="menu-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'guru')) { %>
+      <li class="menu-header">Data Master</li>
+
+      <li class="menu-item">
+        <a href="/siswa" class="menu-link <%= currentPath.startsWith('/siswa') ? 'active' : '' %>">
+          <i class="fas fa-user-graduate"></i>
+          <span>Data Siswa</span>
+        </a>
+      </li>
+
+      <li class="menu-item">
+        <a href="/guru" class="menu-link <%= currentPath.startsWith('/guru') ? 'active' : '' %>">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Data Guru</span>
+        </a>
+      </li>
+    <% } %>
+
+    <li class="menu-header">Akademik</li>
+
+    <li class="menu-item">
+      <a href="/kelas" class="menu-link <%= currentPath.startsWith('/kelas') ? 'active' : '' %>">
+        <i class="fas fa-school"></i>
+        <span>Data Kelas</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="/mapel" class="menu-link <%= currentPath.startsWith('/mapel') ? 'active' : '' %>">
+        <i class="fas fa-book-open"></i>
+        <span>Mata Pelajaran</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <% if (currentUser && currentUser.role === 'siswa') { %>
+        <a href="/nilai/saya" class="menu-link <%= currentPath.startsWith('/nilai') ? 'active' : '' %>">
+          <i class="fas fa-file-invoice"></i>
+          <span>Rapor & Nilai Saya</span>
+        </a>
+      <% } else { %>
+        <a href="/nilai" class="menu-link <%= currentPath.startsWith('/nilai') ? 'active' : '' %>">
+          <i class="fas fa-file-invoice"></i>
+          <span>Penilaian Akademik</span>
+        </a>
+      <% } %>
+    </li>
+
+    <li class="menu-item">
+      <a href="/jadwal" class="menu-link <%= currentPath.startsWith('/jadwal') ? 'active' : '' %>">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Jadwal Pelajaran</span>
+      </a>
+    </li>
+
+    <li class="menu-header">Pengaturan</li>
+
+    <li class="menu-item">
+      <a href="/profile" class="menu-link <%= currentPath.startsWith('/profile') ? 'active' : '' %>">
+        <i class="fas fa-user-circle"></i>
+        <span>Profil Saya</span>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="/auth/logout" class="menu-link text-danger">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Keluar</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <div class="d-flex align-items-center gap-2">
+      <div class="avatar-circle">
+        <%= currentUser && currentUser.nama ? currentUser.nama.charAt(0).toUpperCase() : 'U' %>
+      </div>
+      <div class="d-flex flex-column overflow-hidden">
+        <span class="text-white text-truncate fw-semibold" style="font-size: 0.85rem;">
+          <%= currentUser ? currentUser.nama : 'Pengguna' %>
+        </span>
+        <span class="badge user-badge role-<%= currentUser ? currentUser.role : 'siswa' %> align-self-start mt-1">
+          <%= currentUser ? currentUser.role : 'Guest' %>
+        </span>
+      </div>
+    </div>
+  </div>
+</aside>
+

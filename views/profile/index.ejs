@@ -1,0 +1,119 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Profil Pengguna</h1>
+    <p class="page-subtitle">Kelola akun, informasi kontak, dan keamanan kredensial Anda</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Profile Info Card -->
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+      <div class="avatar-circle mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.2rem;">
+        <%= currentUser.nama ? currentUser.nama.charAt(0).toUpperCase() : 'U' %>
+      </div>
+      <h5 class="fw-bold text-dark mb-1"><%= currentUser.nama %></h5>
+      <p class="text-muted small mb-2"><%= user.email %></p>
+      <span class="badge user-badge role-<%= currentUser.role %> align-self-center px-3 py-1 mb-3">
+        Role: <%= currentUser.role %>
+      </span>
+
+      <hr class="my-3">
+
+      <ul class="list-group list-group-flush text-start small">
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Username</span>
+          <span class="fw-semibold text-dark"><%= user.username %></span>
+        </li>
+        <% if (detail && detail.nip) { %>
+          <li class="list-group-item d-flex justify-content-between px-0 py-2">
+            <span class="text-muted">NIP</span>
+            <span class="fw-semibold text-dark"><%= detail.nip %></span>
+          </li>
+        <% } %>
+        <% if (detail && detail.nis) { %>
+          <li class="list-group-item d-flex justify-content-between px-0 py-2">
+            <span class="text-muted">NIS / NISN</span>
+            <span class="fw-semibold text-dark"><%= detail.nis %> / <%= detail.nisn %></span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between px-0 py-2">
+            <span class="text-muted">Kelas</span>
+            <span class="fw-semibold text-primary"><%= detail.nama_kelas || '-' %></span>
+          </li>
+        <% } %>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Terdaftar Sejak</span>
+          <span class="fw-semibold text-dark"><%= new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Forms Section -->
+  <div class="col-12 col-lg-8">
+    <!-- Update Bio / Contact -->
+    <% if (currentUser.role === 'guru' || currentUser.role === 'siswa') { %>
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-bottom py-3 px-4">
+          <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-address-card text-primary me-2"></i>Informasi Kontak &amp; Domisili</h6>
+        </div>
+        <div class="card-body p-4">
+          <form action="/profile/bio" method="POST">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="no_telp" class="form-label fw-semibold small">Nomor Telepon / WhatsApp</label>
+                <input type="text" class="form-control" id="no_telp" name="no_telp" value="<%= detail ? (detail.no_telp || '') : '' %>" placeholder="08xxxxxxxxxx">
+              </div>
+              <div class="col-12">
+                <label for="alamat" class="form-label fw-semibold small">Alamat Tempat Tinggal</label>
+                <textarea class="form-control" id="alamat" name="alamat" rows="2" placeholder="Alamat lengkap domisili..."><%= detail ? (detail.alamat || '') : '' %></textarea>
+              </div>
+              <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                  <i class="fas fa-save me-1"></i> Simpan Kontak
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Change Password -->
+    <div class="card border-0 shadow-sm rounded-4" id="passwordSection">
+      <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-key text-warning me-2"></i>Ubah Password Akun</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="/profile/password" method="POST">
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="old_password" class="form-label fw-semibold small">Password Lama <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" id="old_password" name="old_password" placeholder="Masukkan password lama Anda" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="new_password" class="form-label fw-semibold small">Password Baru <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Minimal 6 karakter" required minlength="6">
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="confirm_password" class="form-label fw-semibold small">Konfirmasi Password Baru <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Ketik ulang password baru" required minlength="6">
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+              <button type="submit" class="btn btn-warning px-4 fw-semibold">
+                <i class="fas fa-lock me-1"></i> Perbarui Password
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

@@ -1,0 +1,142 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Manajemen Data Kelas</h1>
+    <p class="page-subtitle">Kelola rombongan belajar (rombel), wali kelas, dan tahun akademik</p>
+  </div>
+  <% if (currentUser.role === 'admin') { %>
+    <div>
+      <a href="/kelas/create" class="btn btn-primary rounded-3 px-3 py-2 fw-semibold shadow-sm">
+        <i class="fas fa-plus me-1"></i> Tambah Kelas
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Search Bar -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-3">
+    <form action="/kelas" method="GET" class="row g-2 align-items-center">
+      <div class="col-12 col-md-8">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Cari nama kelas, tingkat, atau wali kelas..." value="<%= search %>">
+        </div>
+      </div>
+      <div class="col-12 col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">
+          <i class="fas fa-search me-1"></i> Cari Kelas
+        </button>
+        <% if (search) { %>
+          <a href="/kelas" class="btn btn-light border" title="Reset pencarian">
+            <i class="fas fa-undo"></i>
+          </a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table Container -->
+<div class="card card-table">
+  <div class="card-header-custom">
+    <span class="fw-bold text-dark fs-6">
+      Total Rombel / Kelas: <span class="badge bg-purple rounded-pill text-white" style="background-color: #7c3aed;"><%= totalCount %></span>
+    </span>
+    <small class="text-muted">Halaman <%= currentPage %> dari <%= totalPages || 1 %></small>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>Nama Kelas</th>
+          <th>Tingkat</th>
+          <th>Wali Kelas</th>
+          <th>Tahun Ajaran</th>
+          <th class="text-center">Jumlah Siswa</th>
+          <th class="text-center" style="width: 160px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (kelasList && kelasList.length > 0) { %>
+          <% kelasList.forEach((k, idx) => { %>
+            <tr>
+              <td><%= ((currentPage - 1) * 10) + idx + 1 %></td>
+              <td><span class="fw-bold text-dark fs-6"><%= k.nama_kelas %></span></td>
+              <td><span class="badge bg-secondary-subtle text-secondary fw-semibold">Tingkat <%= k.tingkat %></span></td>
+              <td>
+                <% if (k.wali_kelas_nama) { %>
+                  <span class="fw-medium text-dark"><i class="fas fa-chalkboard-teacher text-primary me-1"></i><%= k.wali_kelas_nama %></span>
+                <% } else { %>
+                  <span class="text-muted small"><em>Belum ditentukan</em></span>
+                <% } %>
+              </td>
+              <td><%= k.tahun_ajaran %></td>
+              <td class="text-center">
+                <span class="badge bg-primary-subtle text-primary fs-7 px-3 py-1 rounded-pill">
+                  <i class="fas fa-users me-1"></i> <%= k.total_siswa %> Siswa
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <a href="/kelas/detail/<%= k.id %>" class="btn btn-outline-info" title="Lihat Daftar Siswa & Jadwal">
+                    <i class="fas fa-users-viewfinder"></i>
+                  </a>
+                  <% if (currentUser.role === 'admin') { %>
+                    <a href="/kelas/edit/<%= k.id %>" class="btn btn-outline-warning" title="Edit Kelas">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="delete-form-kelas-<%= k.id %>" action="/kelas/delete/<%= k.id %>" method="POST" class="d-inline">
+                      <button type="button" class="btn btn-outline-danger" title="Hapus Kelas" onclick="confirmDelete('delete-form-kelas-<%= k.id %>', 'Kelas <%= k.nama_kelas %>')">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="fas fa-school fs-2 mb-2 d-block text-secondary"></i>
+              Tidak ada data kelas ditemukan.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <small class="text-muted">Menampilkan halaman <%= currentPage %> dari <%= totalPages %></small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="/kelas?page=<%= currentPage - 1 %>&search=<%= search %>">Sebelumnya</a>
+          </li>
+          <% for(let p = 1; p <= totalPages; p++) { %>
+            <li class="page-item <%= currentPage === p ? 'active' : '' %>">
+              <a class="page-link" href="/kelas?page=<%= p %>&search=<%= search %>"><%= p %></a>
+            </li>
+          <% } %>
+          <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="/kelas?page=<%= currentPage + 1 %>&search=<%= search %>">Selanjutnya</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../layouts/footer') %>
+

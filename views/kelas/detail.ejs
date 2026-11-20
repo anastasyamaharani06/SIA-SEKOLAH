@@ -1,0 +1,159 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Detail Kelas: <%= kelas.nama_kelas %></h1>
+    <p class="page-subtitle">Informasi rombongan belajar, wali kelas, dan daftar seluruh peserta didik</p>
+  </div>
+  <div class="d-flex gap-2">
+    <% if (currentUser.role === 'admin') { %>
+      <a href="/kelas/edit/<%= kelas.id %>" class="btn btn-warning rounded-3 px-3">
+        <i class="fas fa-edit me-1"></i> Edit Kelas
+      </a>
+      <a href="/siswa/create?kelas_id=<%= kelas.id %>" class="btn btn-primary rounded-3 px-3">
+        <i class="fas fa-user-plus me-1"></i> Tambah Siswa ke Kelas
+      </a>
+    <% } %>
+    <a href="/kelas" class="btn btn-outline-secondary rounded-3">
+      <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+  </div>
+</div>
+
+<!-- Class Info Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-4">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-3 border-end">
+        <span class="text-muted small d-block">Nama Rombel</span>
+        <span class="fs-4 fw-bold text-dark"><%= kelas.nama_kelas %></span>
+      </div>
+      <div class="col-12 col-md-3 border-end">
+        <span class="text-muted small d-block">Wali Kelas</span>
+        <span class="fs-6 fw-semibold text-primary">
+          <i class="fas fa-chalkboard-teacher me-1"></i> <%= kelas.wali_kelas_nama || 'Belum Ditentukan' %>
+        </span>
+      </div>
+      <div class="col-12 col-md-3 border-end">
+        <span class="text-muted small d-block">Tahun Akademik</span>
+        <span class="fs-6 fw-semibold text-dark"><%= kelas.tahun_ajaran %> (Tingkat <%= kelas.tingkat %>)</span>
+      </div>
+      <div class="col-12 col-md-3">
+        <span class="text-muted small d-block">Total Peserta Didik</span>
+        <span class="fs-4 fw-bold text-success"><%= siswaList.length %> Siswa</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Student List in Class -->
+<div class="card card-table mb-4">
+  <div class="card-header-custom">
+    <span class="fw-bold text-dark fs-6">
+      <i class="fas fa-user-graduate text-primary me-2"></i>Daftar Siswa di Kelas <%= kelas.nama_kelas %>
+    </span>
+    <span class="badge bg-primary rounded-pill"><%= siswaList.length %> Terdaftar</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>NIS</th>
+          <th>NISN</th>
+          <th>Nama Siswa</th>
+          <th>L/P</th>
+          <th>Tanggal Lahir</th>
+          <th>No. Telepon</th>
+          <th class="text-center" style="width: 100px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (siswaList && siswaList.length > 0) { %>
+          <% siswaList.forEach((s, idx) => { %>
+            <tr>
+              <td><%= idx + 1 %></td>
+              <td class="fw-semibold text-dark"><%= s.nis %></td>
+              <td class="text-muted"><%= s.nisn %></td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                    <%= s.nama.charAt(0).toUpperCase() %>
+                  </div>
+                  <span class="fw-semibold text-dark"><%= s.nama %></span>
+                </div>
+              </td>
+              <td>
+                <span class="badge <%= s.jenis_kelamin === 'L' ? 'bg-primary-subtle text-primary' : 'bg-pink-subtle text-danger' %>">
+                  <%= s.jenis_kelamin === 'L' ? 'L' : 'P' %>
+                </span>
+              </td>
+              <td><%= new Date(s.tanggal_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+              <td><%= s.no_telp || '-' %></td>
+              <td class="text-center">
+                <a href="/siswa/detail/<%= s.id %>" class="btn btn-sm btn-outline-info" title="Detail Siswa">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="8" class="text-center py-5 text-muted">Belum ada siswa yang dimasukkan ke kelas ini.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Class Schedules -->
+<div class="card card-table">
+  <div class="card-header-custom">
+    <span class="fw-bold text-dark fs-6">
+      <i class="fas fa-calendar-alt text-primary me-2"></i>Jadwal Pelajaran Kelas <%= kelas.nama_kelas %>
+    </span>
+    <% if (currentUser.role === 'admin') { %>
+      <a href="/jadwal/create?kelas_id=<%= kelas.id %>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+        <i class="fas fa-plus me-1"></i> Tambah Jadwal
+      </a>
+    <% } %>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th>Hari</th>
+          <th>Waktu</th>
+          <th>Mata Pelajaran</th>
+          <th>Guru Pengampu</th>
+          <th>Ruangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (jadwalList && jadwalList.length > 0) { %>
+          <% jadwalList.forEach(j => { %>
+            <tr>
+              <td><span class="badge bg-primary-subtle text-primary fw-semibold"><%= j.hari %></span></td>
+              <td><%= j.jam_mulai.slice(0, 5) %> - <%= j.jam_selesai.slice(0, 5) %></td>
+              <td class="fw-semibold text-dark"><%= j.nama_mapel %></td>
+              <td><%= j.guru_nama %></td>
+              <td><span class="badge bg-light text-dark"><%= j.ruangan %></span></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">Belum ada jadwal yang diatur untuk kelas ini.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

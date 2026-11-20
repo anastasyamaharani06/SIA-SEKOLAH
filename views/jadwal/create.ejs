@@ -1,0 +1,92 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Tambah Jadwal Pelajaran</h1>
+    <p class="page-subtitle">Alokasikan waktu dan ruangan untuk kelas dan guru pengampu</p>
+  </div>
+  <a href="/jadwal" class="btn btn-outline-secondary rounded-3">
+    <i class="fas fa-arrow-left me-1"></i> Kembali
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-calendar-plus text-primary me-2"></i>Formulir Jadwal</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="/jadwal" method="POST">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="kelas_id" class="form-label fw-semibold small">Rombel / Kelas <span class="text-danger">*</span></label>
+              <select class="form-select" id="kelas_id" name="kelas_id" required>
+                <option value="">-- Pilih Kelas --</option>
+                <% kelasList.forEach(k => { %>
+                  <option value="<%= k.id %>" <%= formData.kelas_id == k.id ? 'selected' : '' %>><%= k.nama_kelas %> (<%= k.tingkat %>)</option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="mapel_id" class="form-label fw-semibold small">Mata Pelajaran <span class="text-danger">*</span></label>
+              <select class="form-select" id="mapel_id" name="mapel_id" required>
+                <option value="">-- Pilih Mata Pelajaran --</option>
+                <% mapelList.forEach(m => { %>
+                  <option value="<%= m.id %>" <%= formData.mapel_id == m.id ? 'selected' : '' %>><%= m.nama_mapel %> (<%= m.kode_mapel %>)</option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="guru_id" class="form-label fw-semibold small">Guru Pengajar <span class="text-danger">*</span></label>
+              <select class="form-select" id="guru_id" name="guru_id" required>
+                <option value="">-- Pilih Guru Pengampu --</option>
+                <% guruList.forEach(g => { %>
+                  <option value="<%= g.id %>" <%= formData.guru_id == g.id ? 'selected' : '' %>><%= g.nama %> (NIP: <%= g.nip %>)</option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label for="hari" class="form-label fw-semibold small">Hari <span class="text-danger">*</span></label>
+              <select class="form-select" id="hari" name="hari" required>
+                <% ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'].forEach(h => { %>
+                  <option value="<%= h %>" <%= formData.hari === h ? 'selected' : '' %>><%= h %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label for="jam_mulai" class="form-label fw-semibold small">Jam Mulai <span class="text-danger">*</span></label>
+              <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" value="<%= formData.jam_mulai || '07:30' %>" required>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label for="jam_selesai" class="form-label fw-semibold small">Jam Selesai <span class="text-danger">*</span></label>
+              <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" value="<%= formData.jam_selesai || '09:00' %>" required>
+            </div>
+
+            <div class="col-12">
+              <label for="ruangan" class="form-label fw-semibold small">Ruangan / Laboratorium</label>
+              <input type="text" class="form-control" id="ruangan" name="ruangan" placeholder="Contoh: Lab Komputer 1 / Ruang Kelas X-1" value="<%= formData.ruangan || 'Ruang Kelas' %>">
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a href="/jadwal" class="btn btn-light border px-4">Batal</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="fas fa-save me-1"></i> Simpan Jadwal
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

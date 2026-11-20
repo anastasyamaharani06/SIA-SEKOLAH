@@ -1,0 +1,91 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Edit Data Siswa</h1>
+    <p class="page-subtitle">Perbarui data profil akademik siswa <%= siswa.nama %></p>
+  </div>
+  <a href="/siswa" class="btn btn-outline-secondary rounded-3">
+    <i class="fas fa-arrow-left me-1"></i> Kembali
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-9">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-user-edit text-warning me-2"></i>Perbarui Data Siswa</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="/siswa/edit/<%= siswa.id %>" method="POST">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="nis" class="form-label fw-semibold small">Nomor Induk Siswa (NIS) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nis" name="nis" value="<%= siswa.nis %>" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="nisn" class="form-label fw-semibold small">NISN Nasional <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nisn" name="nisn" value="<%= siswa.nisn %>" required>
+            </div>
+
+            <div class="col-12 col-md-8">
+              <label for="nama" class="form-label fw-semibold small">Nama Lengkap Siswa <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nama" name="nama" value="<%= siswa.nama %>" required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label fw-semibold small">Jenis Kelamin <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline mt-1">
+                  <input class="form-check-input" type="radio" name="jenis_kelamin" id="jkL" value="L" <%= siswa.jenis_kelamin === 'L' ? 'checked' : '' %>>
+                  <label class="form-check-label" for="jkL">Laki-Laki</label>
+                </div>
+                <div class="form-check form-check-inline mt-1">
+                  <input class="form-check-input" type="radio" name="jenis_kelamin" id="jkP" value="P" <%= siswa.jenis_kelamin === 'P' ? 'checked' : '' %>>
+                  <label class="form-check-label" for="jkP">Perempuan</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="tanggal_lahir" class="form-label fw-semibold small">Tanggal Lahir <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="<%= siswa.tanggal_lahir ? new Date(siswa.tanggal_lahir).toISOString().split('T')[0] : '' %>" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="no_telp" class="form-label fw-semibold small">Nomor Telepon / WhatsApp</label>
+              <input type="text" class="form-control" id="no_telp" name="no_telp" value="<%= siswa.no_telp || '' %>">
+            </div>
+
+            <div class="col-12">
+              <label for="kelas_id" class="form-label fw-semibold small">Penempatan Kelas</label>
+              <select class="form-select" id="kelas_id" name="kelas_id">
+                <option value="">-- Pilih Kelas --</option>
+                <% kelasList.forEach(k => { %>
+                  <option value="<%= k.id %>" <%= siswa.kelas_id == k.id ? 'selected' : '' %>>
+                    <%= k.nama_kelas %> (Tingkat <%= k.tingkat %> - Thn <%= k.tahun_ajaran %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="alamat" class="form-label fw-semibold small">Alamat Tempat Tinggal</label>
+              <textarea class="form-control" id="alamat" name="alamat" rows="2"><%= siswa.alamat || '' %></textarea>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a href="/siswa" class="btn btn-light border px-4">Batal</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="fas fa-save me-1"></i> Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

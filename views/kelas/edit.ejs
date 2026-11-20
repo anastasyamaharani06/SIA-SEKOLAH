@@ -1,0 +1,68 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Edit Rombel / Kelas</h1>
+    <p class="page-subtitle">Perbarui data kelas <%= kelas.nama_kelas %></p>
+  </div>
+  <a href="/kelas" class="btn btn-outline-secondary rounded-3">
+    <i class="fas fa-arrow-left me-1"></i> Kembali
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-edit text-warning me-2"></i>Perbarui Data Kelas</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="/kelas/edit/<%= kelas.id %>" method="POST">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="nama_kelas" class="form-label fw-semibold small">Nama Kelas <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nama_kelas" name="nama_kelas" value="<%= kelas.nama_kelas %>" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="tingkat" class="form-label fw-semibold small">Tingkat / Jenjang <span class="text-danger">*</span></label>
+              <select class="form-select" id="tingkat" name="tingkat" required>
+                <option value="X" <%= kelas.tingkat === 'X' ? 'selected' : '' %>>Kelas X (Sepuluh)</option>
+                <option value="XI" <%= kelas.tingkat === 'XI' ? 'selected' : '' %>>Kelas XI (Sebelas)</option>
+                <option value="XII" <%= kelas.tingkat === 'XII' ? 'selected' : '' %>>Kelas XII (Dua Belas)</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="wali_kelas_id" class="form-label fw-semibold small">Wali Kelas</label>
+              <select class="form-select" id="wali_kelas_id" name="wali_kelas_id">
+                <option value="">-- Belum Ditentukan --</option>
+                <% guruList.forEach(g => { %>
+                  <option value="<%= g.id %>" <%= kelas.wali_kelas_id == g.id ? 'selected' : '' %>>
+                    <%= g.nama %> (NIP: <%= g.nip %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="tahun_ajaran" class="form-label fw-semibold small">Tahun Ajaran <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="tahun_ajaran" name="tahun_ajaran" value="<%= kelas.tahun_ajaran %>" required>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a href="/kelas" class="btn btn-light border px-4">Batal</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="fas fa-save me-1"></i> Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

@@ -1,0 +1,150 @@
+<%- include('../layouts/header') %>
+<%- include('../layouts/sidebar') %>
+<%- include('../layouts/navbar') %>
+
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <div>
+    <h1 class="page-title">Manajemen Data Guru</h1>
+    <p class="page-subtitle">Kelola tenaga pendidik, nomor induk pegawai (NIP), dan mata pelajaran diampu</p>
+  </div>
+  <% if (currentUser.role === 'admin') { %>
+    <div>
+      <a href="/guru/create" class="btn btn-primary rounded-3 px-3 py-2 fw-semibold shadow-sm">
+        <i class="fas fa-plus me-1"></i> Tambah Guru
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Search Bar -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-3">
+    <form action="/guru" method="GET" class="row g-2 align-items-center">
+      <div class="col-12 col-md-8">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Cari berdasarkan NIP, Nama Guru, atau Alamat..." value="<%= search %>">
+        </div>
+      </div>
+      <div class="col-12 col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">
+          <i class="fas fa-search me-1"></i> Cari Guru
+        </button>
+        <% if (search) { %>
+          <a href="/guru" class="btn btn-light border" title="Reset pencarian">
+            <i class="fas fa-undo"></i>
+          </a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table Container -->
+<div class="card card-table">
+  <div class="card-header-custom">
+    <span class="fw-bold text-dark fs-6">
+      Total Guru: <span class="badge bg-success rounded-pill"><%= totalCount %></span>
+    </span>
+    <small class="text-muted">Halaman <%= currentPage %> dari <%= totalPages || 1 %></small>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom">
+      <thead>
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>NIP</th>
+          <th>Nama Guru &amp; Gelar</th>
+          <th>L/P</th>
+          <th>Mata Pelajaran Diampu</th>
+          <th>No. Telepon</th>
+          <th class="text-center" style="width: 160px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (guruList && guruList.length > 0) { %>
+          <% guruList.forEach((g, idx) => { %>
+            <tr>
+              <td><%= ((currentPage - 1) * 10) + idx + 1 %></td>
+              <td><span class="fw-semibold text-dark"><%= g.nip %></span></td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.8rem; background: linear-gradient(135deg, #10b981, #059669);">
+                    <%= g.nama.charAt(0).toUpperCase() %>
+                  </div>
+                  <div>
+                    <span class="fw-semibold text-dark"><%= g.nama %></span>
+                    <% if (g.email) { %><br><small class="text-muted"><%= g.email %></small><% } %>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge <%= g.jenis_kelamin === 'L' ? 'bg-primary-subtle text-primary' : 'bg-pink-subtle text-danger' %> px-2 py-1">
+                  <%= g.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' %>
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-info-subtle text-info-emphasis fw-medium">
+                  <%= g.mapel_diampu || 'Belum Ditugaskan' %>
+                </span>
+              </td>
+              <td><%= g.no_telp || '-' %></td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <a href="/guru/detail/<%= g.id %>" class="btn btn-outline-info" title="Detail Guru">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <% if (currentUser.role === 'admin') { %>
+                    <a href="/guru/edit/<%= g.id %>" class="btn btn-outline-warning" title="Edit Data">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="delete-form-guru-<%= g.id %>" action="/guru/delete/<%= g.id %>" method="POST" class="d-inline">
+                      <button type="button" class="btn btn-outline-danger" title="Hapus Guru" onclick="confirmDelete('delete-form-guru-<%= g.id %>', '<%= g.nama %>')">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="fas fa-chalkboard-teacher fs-2 mb-2 d-block text-secondary"></i>
+              Tidak ada data guru ditemukan.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <small class="text-muted">Menampilkan halaman <%= currentPage %> dari <%= totalPages %></small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="/guru?page=<%= currentPage - 1 %>&search=<%= search %>">Sebelumnya</a>
+          </li>
+          <% for(let p = 1; p <= totalPages; p++) { %>
+            <li class="page-item <%= currentPage === p ? 'active' : '' %>">
+              <a class="page-link" href="/guru?page=<%= p %>&search=<%= search %>"><%= p %></a>
+            </li>
+          <% } %>
+          <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="/guru?page=<%= currentPage + 1 %>&search=<%= search %>">Selanjutnya</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../layouts/footer') %>
+
